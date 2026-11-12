@@ -409,6 +409,40 @@ background:radial-gradient(circle at 50% 0%,#2a1b52,#0b0718 70%)}
   .pcard small{font-size:10px}
 }
 </style>
+<style>
+/* ===== 對峲舞台（擇英雄空白區） ===== */
+.pcol{flex:1 1 430px;display:flex;flex-direction:column;justify-content:flex-end;align-self:stretch;min-width:0}
+.pcol>#pickgrid{flex:0 0 auto;width:100%;align-self:stretch}
+#standoff{display:none}
+@media(min-width:900px){
+  #standoff{display:flex;flex:1 1 0;min-height:0;align-items:stretch;gap:14px;margin-bottom:12px}
+}
+@media(max-height:700px){#standoff{display:none!important}}
+#standoff .sd{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(4px,1.2vh,12px);padding:12px;border-radius:20px;border:2px solid #ffffff1f;opacity:.6;transition:.25s;overflow:hidden}
+#standoff .sdA{background:radial-gradient(circle at 50% 28%,#4a1d33,#150f2e 72%)}
+#standoff .sdB{background:radial-gradient(circle at 50% 28%,#16304f,#150f2e 72%)}
+#standoff .sd.got{opacity:1;border-color:#ffd16655}
+#standoff .sd.act{opacity:1;animation:sdPulse 1.6s ease-in-out infinite}
+@keyframes sdPulse{0%,100%{box-shadow:0 0 0 3px #ffd16633,0 0 14px #ffd16633}50%{box-shadow:0 0 0 4px #ffd16699,0 0 34px #ffd16688}}
+#standoff .sdtag{font-size:clamp(12px,1.9vh,22px);font-weight:900;letter-spacing:.5px;padding:3px 15px;border-radius:20px;color:#fff;white-space:nowrap}
+#standoff .sdA .sdtag{background:linear-gradient(#f2655a,#c8382c)}
+#standoff .sdB .sdtag{background:linear-gradient(#54aef0,#2374b8)}
+#standoff .sdface{font-size:clamp(44px,17vh,190px);line-height:1;font-weight:900;color:#ffffff30;filter:grayscale(.6)}
+#standoff .sd.got .sdface{color:#fff;filter:none;text-shadow:0 0 26px #ffd16655}
+#standoff .sdname{font-size:clamp(15px,3vh,38px);font-weight:900;color:#ffe9a8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+#standoff .sdblurb{font-size:clamp(11px,1.7vh,20px);font-weight:800;color:#ffffffb8;text-align:center;line-height:1.45;max-width:min(100%,360px)}
+#standoff .sdvs{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-width:clamp(64px,9vw,120px)}
+#standoff .sdvs b{font-size:clamp(22px,5vh,60px);font-weight:900;color:#fff;letter-spacing:1px;text-shadow:0 0 24px #ffd16699}
+#standoff .sdvs small{font-size:clamp(10px,1.5vh,14px);font-weight:900;color:#ffe9a8;opacity:.9;white-space:nowrap}
+#standoff .sdvs .ropebar{width:134%;margin-left:-17%;height:5px;border-radius:4px;background:repeating-linear-gradient(90deg,#e8d9b0 0 8px,#c9b48a 8px 16px);opacity:.8;animation:sdRope 2.6s ease-in-out infinite}
+@keyframes sdRope{0%,100%{transform:translateX(-4px) skewX(-3deg)}50%{transform:translateX(4px) skewX(3deg)}}
+@media(prefers-reduced-motion:reduce){#standoff *{animation:none!important}}
+#standoff .sdvs b{animation:sdVs 2.6s ease-in-out infinite}
+@keyframes sdVs{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+#standoff .sd:not(.got) .sdface{animation:sdFloat 3s ease-in-out infinite}
+@keyframes sdFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+#standoff .sdface.pop{animation:sdPop .45s cubic-bezier(.2,1.5,.4,1)}
+@keyframes sdPop{0%{transform:scale(.35) rotate(-8deg);opacity:.2}60%{transform:scale(1.14) rotate(3deg);opacity:1}100%{transform:scale(1) rotate(0)}}
 <style id="pbarSpace">
 /* 浮動操作列係 position:fixed，會蓋住最底一行答案 → 預留高度 */
 body.game{padding-bottom:104px}
@@ -475,7 +509,14 @@ body.game{padding-bottom:104px}
 </div>
 <h2 id="pickTitle">🛡️ Team A（紅）揀自己嘅英雄</h2>
 <div class="pwrap">
+<div class="pcol">
+<div id="standoff">
+<div class="sd sdA" id="sdA"><div class="sdtag">🛡️ Team A</div><div class="sdface" id="sdFaceA">?</div><div class="sdname" id="sdNameA">——</div><div class="sdblurb" id="sdBlurbA"></div></div>
+<div class="sdvs"><div class="ropebar"></div><b>VS</b><small id="sdRound">——</small></div>
+<div class="sd sdB" id="sdB"><div class="sdtag">⚔️ Team B</div><div class="sdface" id="sdFaceB">?</div><div class="sdname" id="sdNameB">——</div><div class="sdblurb" id="sdBlurbB"></div></div>
+</div>
 <div id="pickgrid"></div>
+</div>
 <div class="pvside">
 <div id="pvhost"></div>
 <div class="pvlbl"><div id="pvteam">🛡️ Team A 英雄</div><div id="pvname">…</div></div>
@@ -562,10 +603,11 @@ body.game{padding-bottom:104px}
 /* ================= 語言切換（中文預設，可切英文） ================= */
 var LANG=(function(){try{return localStorage.getItem('heroLang')==='en'?'en':'zh'}catch(e){return 'zh';}})();
 function i18(zh,en){return LANG==='en'?en:zh;}
+const _pl=n=>n===1?'':'s';   // English plural suffix
 const EN_DICT={
  '英雄拔河 · 學科競技場':'Hero Tug-of-War · Subject Arena',
  '分':'pts',
- '✔ 答對　✘ 答錯／超時':'✔ correct   ✘ wrong / time-up',
+ '✔ 答對　✘ 答錯／超時':'✔ correct   ✘ wrong / out of time',
  '⛶ 全螢幕':'⛶ Fullscreen',
  '全螢幕（電子黑板授課）':'Fullscreen (interactive whiteboard)',
  '👩‍🏫 老師：可以用自己嘅題庫':'👩‍🏫 Teacher: use your own questions',
@@ -583,7 +625,7 @@ const EN_DICT={
  '⚔️ Team B 英雄':'⚔️ Team B hero',
  '↩ 重揀 Team A':'↩ Re-pick Team A','↩ 重揀 Team B':'↩ Re-pick Team B',
  '全場題數':'Questions per team',
- 'A：——　B：——':'A: ——　B: ——',
+ 'A：——　B：——':'A: ——   B: ——',
  'Team B 揀人 →':'Team B picks →','開始拔河 →':'Start! →',
  '↩ 返去揀英雄':'↩ Change heroes',
  '全部課題':'All topics',
@@ -597,16 +639,48 @@ const EN_DICT={
  '4N8 小數(二)':'4N8 Decimals (II)',
  '周界·面積·圖形·棒形圖':'Perimeter · area · shapes · bar charts',
  '重新開始':'Restart','🔊 聲音開':'🔊 Sound on','🔇 聲音關':'🔇 Sound off',
- '用法：投射全班分 Team A / Team B 兩隊，輪流撳自己嗰邊，答對才加一分，答錯或超時不計分。':'How to play: split the class into Team A / Team B and take turns tapping your own side. One point per correct answer; a wrong answer or a time-up scores nothing.',
- 'A：':'A: ','　B：':'　B: ',
+ '用法：投射全班分 Team A / Team B 兩隊，輪流撳自己嗰邊，答對才加一分，答錯或超時不計分。':'How to play: split the class into Team A / Team B and take turns tapping your own side. One point per correct answer; a wrong answer, or running out of time, scores no point.',
+ 'A：':'A: ','　B：':'  B: ',
  '✏️ 老師出題區（撳我展開，加題/刪題，自動儲存喺呢部機）':'✏️ Teacher area (click to open — add / delete questions, saved on this device)',
  '題目，例如：36 ÷ 12 = ?':'Question, e.g. 36 ÷ 12 = ?',
  '正確答案':'Correct answer','錯答1':'Wrong 1','錯答2':'Wrong 2','錯答3':'Wrong 3',
- '＋加入題庫':'＋ Add question','＋批量加入':'＋ Add pasted rows','取代整個題庫':'Replace whole bank',
+ '＋加入題庫':'+ Add question','＋批量加入':'+ Add pasted rows','取代整個題庫':'Replace whole bank',
  '下載備份(JSON)':'Backup (JSON)','下載題庫模板(CSV)':'Template (CSV)','還原預設30題':'Restore 30 defaults',
- '由 Excel / Word 表格直接複製貼上':'Paste straight from an Excel / Word table, one question per row: topic⇥question⇥answer⇥wrong1⇥wrong2⇥wrong3 (4 columns = one topic for all)',
+ '由 Excel / Word 表格直接複製貼上':'Paste straight from an Excel or Word table, one question per row, with tab-separated columns: topic, question, answer, wrong 1, wrong 2, wrong 3 (4 columns means the same topic for every row)',
  '✏️ 分數寫法：假分數 9/4、帶分數 2又1/3。Excel 會把 9/4 當成日期，模板已鎖成 ="9/4"，匯入時自動拆走。':'✏️ Fractions: 9/4 (improper) or 2 1/3 (mixed). Excel turns 9/4 into a date, so the template locks it as ="9/4" and import strips it.',
  '現有':'Questions stored on this device: ',
+
+  '返去揀英雄（主頁）':'Back to hero selection (home)',
+  '科目 · 年級 · 課題':'Subject · Grade · Topic',
+  '老師可改副標題，自動儲存':'Editable subtitle — saved automatically',
+  '切換語言 / Switch language':'Switch language',
+  '例如：36 ÷ 12 = ? / 中國首都是？':'e.g. 36 ÷ 12 = ? or What is 12 × 7?',
+  '唯一正確嘅答案':'The one correct answer',
+  '學生常犯嘅錯':'A mistake students often make',
+  '另一個錯答':'Another wrong answer',
+  '（可留空，最少要有 1 個）':'(optional, at least 1)',
+  '每行一題，最少 4 欄：題目　答案　錯1　錯2（可加錯3；最前面加課題也得，可留空）\n23 × 14 = ?\t322\t272\t282\t312\n中國首都是？\t北京\t上海\t廣州':'One question per row, with tab-separated columns: question, answer, wrong 1, wrong 2, wrong 3 (4 columns means the same topic for every row)\n23 × 14 = ?\t322\t272\t282\t312\n12 × 7 = ?\t84\t74\t94',
+
+  '✏️ 題庫編輯':'✏️ Question Bank',
+  '← 返去揀英雄':'← Back to hero selection',
+  '① 新增一題':'① Add one question',
+  '題目（任何科目、任何形式都可以）':'Question (any subject, any format)',
+  '✅ 正確答案':'✅ Correct answer',
+  '❌ 錯答 1':'❌ Wrong 1',
+  '❌ 錯答 2':'❌ Wrong 2',
+  '❌ 錯答 3':'❌ Wrong 3',
+  '（題目會顯示喺呢度）':'(your question appears here)',
+  '＋ 加入題庫':'+ Add to bank',
+  '② 批量貼上（由 Excel / Word 表格直接複製）':'② Bulk paste (straight from an Excel / Word table)',
+  '＋ 批量加入':'+ Add all',
+  '取代整個題庫':'Replace whole bank',
+  '③ 檔案 / 備份':'③ Files / backup',
+  '⬇ 下載題庫模板(CSV)':'⬇ Template (CSV)',
+  '⬇ 下載備份(JSON)':'⬇ Backup (JSON)',
+  '📂 載入 CSV / JSON':'📂 Load CSV / JSON',
+  '↺ 還原預設30題':'↺ Restore 30 defaults',
+  '④ 現有題目（撳「刪」移除）':'④ Current questions (click “Delete” to remove)',
+  '刪':'Delete'
 };
 let _i18nSnap=null;
 function i18Snapshot(){
@@ -700,8 +774,8 @@ const DEFAULT_BANK=[
 ];
 const DEFAULT_BANK_EN=[
 {t:"4N1",q:"Use the column method: 23 × 14 = ?",a:"322",w:["272","282","312"]},
-{t:"4N1",q:"125 × 24 = ?  (Hint: 125 × 8 × 3)",a:"3000",w:["300","3750","2500"]},
-{t:"4N1",q:"What's the fastest way to work out 25 × 53 × 4?",a:"53×100=5300",w:["53×53=2809","25×212=530","53×4=212"]},
+{t:"4N1",q:"125 × 24 = ? (Hint: 125 × 8 × 3)",a:"3000",w:["300","3750","2500"]},
+{t:"4N1",q:"What is the fastest way to work out 25 × 53 × 4?",a:"53×100=5300",w:["53×53=2809","25×212=530","53×4=212"]},
 {t:"4N2",q:"84 ÷ 12 = ?",a:"7",w:["6","8","7 r 1"]},
 {t:"4N2",q:"135 ÷ 15 = ?",a:"9",w:["8","10","7"]},
 {t:"4N2",q:"Which of these is divisible by 3?",a:"51",w:["50","52","49"]},
@@ -710,10 +784,10 @@ const DEFAULT_BANK_EN=[
 {t:"4N3",q:"Which are the factors of 20?",a:"1, 2, 4, 5, 10, 20",w:["1, 3, 6, 20","2, 4, 8, 20","1, 2, 3, 20"]},
 {t:"4N3",q:"Which is a prime number?",a:"13",w:["1","15","21"]},
 {t:"4N3",q:"Is 1 prime or composite?",a:"Neither — 1 is special",w:["Prime","Composite","Even"]},
-{t:"4N4",q:"What is the L.C.M. of 4 and 6?",a:"12",w:["6","24","8"]},
-{t:"4N4",q:"What is the H.C.F. of 8 and 12?",a:"4",w:["2","6","12"]},
-{t:"4N4",q:"What are the H.C.F. and L.C.M. of 2 and 4?",a:"H.C.F.=2, L.C.M.=4",w:["H.C.F.=4, L.C.M.=2","H.C.F.=1, L.C.M.=8","H.C.F.=2, L.C.M.=8"]},
-{t:"4N5",q:"23×17 + 23×13 = ?",a:"23×30=690",w:["23×30=630","40×23=920","23×4=92"]},
+{t:"4N4",q:"What is the LCM of 4 and 6?",a:"12",w:["6","24","8"]},
+{t:"4N4",q:"What is the HCF of 8 and 12?",a:"4",w:["2","6","12"]},
+{t:"4N4",q:"What are the HCF and LCM of 2 and 4?",a:"HCF = 2, LCM = 4",w:["HCF = 4, LCM = 2","HCF = 1, LCM = 8","HCF = 2, LCM = 8"]},
+{t:"4N5",q:"23 × 17 + 23 × 13 = ?",a:"23 × 30 = 690",w:["23 × 30 = 630","40 × 23 = 920","23 × 4 = 92"]},
 {t:"4N5",q:"4 × (25 + 8) = ?",a:"132",w:["108","400","124"]},
 {t:"4N5",q:"With brackets, which part do you work out first?",a:"The part inside the brackets",w:["Any part, left to right","The addition","The largest number"]},
 {t:"4N6",q:"What is 7/3 as a mixed number?",a:"2 1/3",w:["2 2/3","3 1/3","1 4/3"]},
@@ -721,14 +795,14 @@ const DEFAULT_BANK_EN=[
 {t:"4N6",q:"Multiply top and bottom of 3/8 by 2. What do you get?",a:"6/16",w:["5/10","6/8","3/16"]},
 {t:"4N6",q:"2/5 + 1/5 = ?",a:"3/5",w:["3/10","2/10","4/5"]},
 {t:"4N7",q:"How do you read 30.102?",a:"Thirty point one zero two",w:["Thirty point one hundred and two","Thirty point one two","Three zero point one zero two"]},
-{t:"4N7",q:"23 dollars and 50 cents = ?",a:"$23.50",w:["$23.05","$20.35","$23.50 cents"]},
+{t:"4N7",q:"Write 23 dollars and 50 cents using a dollar sign.",a:"$23.50",w:["$23.05","$20.35","$23.50 cents"]},
 {t:"4N7",q:"Which is greater: 12.35 or 12.205?",a:"12.35",w:["12.205","They are equal","You cannot compare them"]},
 {t:"4N8",q:"4.25 + 1.5 = ?",a:"5.75",w:["5.30","4.40","5.25"]},
 {t:"4N8",q:"9.6 − 3.25 = ?",a:"6.35",w:["6.45","6.25","5.35"]},
 {t:"MSD",q:"A square has sides of 9 cm. What is its perimeter?",a:"36 cm",w:["81 cm","18 cm","45 cm"]},
 {t:"MSD",q:"A rectangle is 12 cm by 5 cm. What is its area?",a:"60 cm²",w:["34 cm²","17 cm²","50 cm²"]},
 {t:"MSD",q:"Which is a property of parallel lines?",a:"They never meet",w:["They meet at right angles","They meet at one point","They are the same length"]},
-{t:"MSD",q:"On a bar chart 1 square = 5 pupils. How many pupils are in 4 squares?",a:"20 pupils",w:["9 pupils","4 pupils","25 pupils"]},
+{t:"MSD",q:"On a bar chart, 1 square = 5 pupils. How many pupils are in 4 squares?",a:"20 pupils",w:["9 pupils","4 pupils","25 pupils"]},
 ];
 const KEY="p4_tug_bank";
 let BANK=[];
@@ -737,9 +811,9 @@ try{BANK=JSON.parse(localStorage.getItem(KEY))||DEF_BANK().slice();}catch(e){BAN
 function save(){localStorage.setItem(KEY,JSON.stringify(BANK));listQ();}
 function addQ(){const q=nQ.value.trim(),a=nA.value.trim(),w=[nW1.value.trim(),nW2.value.trim(),nW3.value.trim()].filter(x=>x);
 if(!q||!a||w.length<1){alert(i18("請填題目＋正確答案＋至少1個錯答","Please fill in the question, the correct answer and at least one wrong answer"));return;}
-BANK.push({t:'',q:q,a:a,w:w.length>=3?w:[...w,...w,...w].slice(0,3)});nQ.value=nA.value=nW1.value=nW2.value=nW3.value="";save();qPrev();alert(i18("已加入！而家共","Added. The bank now has ")+BANK.length+i18("題"," questions"));}
+BANK.push({t:'',q:q,a:a,w:w.length>=3?w:[...w,...w,...w].slice(0,3)});nQ.value=nA.value=nW1.value=nW2.value=nW3.value="";save();qPrev();alert(i18("已加入！而家共 "+BANK.length+" 題","Added. The bank now has "+BANK.length+" question"+_pl(BANK.length)));}
 function qPrev(){const el=document.getElementById('qPrev');if(!el)return;el.textContent='';
-const d=document.createElement('div');d.textContent=nQ.value.trim()||'（題目會顯示喺呢度）';el.appendChild(d);
+const d=document.createElement('div');d.textContent=nQ.value.trim()||i18('（題目會顯示喺呢度）','(your question appears here)');el.appendChild(d);
 [[nA.value.trim(),'ok'],[nW1.value.trim(),''],[nW2.value.trim(),''],[nW3.value.trim(),'']].forEach(p=>{
 if(!p[0])return;const i=document.createElement('i');if(p[1])i.className=p[1];i.textContent=p[0];el.appendChild(i);});}
 ['nQ','nA','nW1','nW2','nW3'].forEach(id=>{const e=document.getElementById(id);if(e)e.addEventListener('input',qPrev);});
@@ -775,27 +849,27 @@ return {out:out,bad:bad};}
 function bulkQ(rep){const txt=document.getElementById('bulk').value,msg=document.getElementById('bulkmsg');
 const r=parseRows(txt,'');
 if(!r.out.length){msg.textContent=i18("冇讀到題目：檢查分隔符（Tab / | / ;）同每行 4–6 欄","No questions found — check the separators (Tab / | / ;) and that each row has 4–6 columns");return;}
-if(rep&&!confirm(i18("用貼上嘅 ","Replace the current ")+BANK.length+i18(" 題，用貼上嘅 "," questions with the pasted ")+r.out.length+i18(" 題？"," questions?")))return;
+if(rep&&!confirm(i18("用貼上嘅 "+r.out.length+" 題取代現有 "+BANK.length+" 題？","Replace the current "+BANK.length+" question"+_pl(BANK.length)+" with the pasted "+r.out.length+" question"+_pl(r.out.length)+"?")))return;
 BANK=rep?r.out:BANK.concat(r.out);save();reset();
-msg.textContent=i18("成功 ","Added ")+r.out.length+i18(" 題"," questions")+(r.bad.length?i18("，失敗第 "," — failed on row ")+r.bad.join(",")+i18(" 行",""):"")+i18("，現共 "," — bank now ")+BANK.length+i18(" 題"," questions");}
+msg.textContent=i18("成功加入 "+r.out.length+" 題","Added "+r.out.length+" question"+_pl(r.out.length))+(r.bad.length?i18("，第 "+r.bad.join(", ")+" 行失敗","; row "+r.bad.join(", ")+" failed"):"")+i18("，現共 "+BANK.length+" 題"," — the bank now holds "+BANK.length+" question"+_pl(BANK.length));}
 function delQ(i){if(confirm(i18("刪第","Delete question ")+(i+1)+"?")){BANK.splice(i,1);save();}}
 function resetQ(){if(confirm(i18("還原預設題？會洗走你加嘅。","Restore the default questions? Anything you added will be lost."))){BANK=DEF_BANK().slice();save();reset();}}
 function exportQ(){const b=new Blob([JSON.stringify(BANK,null,1)],{type:"application/json"});const u=URL.createObjectURL(b);const l=document.createElement("a");l.href=u;l.download="p4_tug_questions.json";l.click();}
 function bankCSV(){const cell=s=>{s=String(s==null?'':s);
    let v=/^\s*\d{1,4}(?:\s*又\s*\d{1,4}|\s+\d{1,3})?\s*[\/／]\s*\d{1,4}\s*$/.test(s)?'="'+s+'"':s;
    return /[",\n\r]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;};
-const rows=[[i18('※※※ 分數寫法：假分數 9/4、帶分數 2又1/3。Excel 見到 ="9/4" 係鎖成文字嘅保護格式，唔好改做日期。呢一行匯入時會自動忽略 ※※※','※※※ Fractions: 9/4 or 2 1/3. Excel shows ="9/4" because it is locked as text — do not turn it into a date. This row is ignored on import. ※※※')],
+const rows=[[i18('※※※ 分數寫法：假分數 9/4、帶分數 2又1/3。Excel 見到 ="9/4" 係鎖成文字嘅保護格式，唔好改做日期。呢一行匯入時會自動忽略 ※※※','※※※ Fractions: 9/4 or 2 1/3. Excel shows ="9/4" because it is locked as text — do not turn it into a date. This line is skipped when the file is imported. ※※※')],
 [i18('課題','Topic'),i18('題目','Question'),i18('正確答案','Correct'),i18('錯答1','Wrong 1'),i18('錯答2','Wrong 2'),i18('錯答3','Wrong 3')]].concat(BANK.map(q=>[q.t,q.q,q.a,q.w[0],q.w[1],q.w[2]]));
 return '\uFEFF'+rows.map(r=>r.map(cell).join(',')).join('\r\n');}
 function exportCSV(){const b=new Blob([bankCSV()],{type:'text/csv;charset=utf-8'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download='題庫模板.csv';a.click();}
 function importQ(el){const f=el.files[0];if(!f)return;const r=new FileReader();
 r.onload=()=>{const buf=r.result;let s;try{s=new TextDecoder('utf-8',{fatal:true}).decode(buf);}catch(e){try{s=new TextDecoder('big5').decode(buf);}catch(e2){alert(i18("讀唔到檔案編碼","Cannot read this file — unsupported encoding"));return;}}
 s=s.replace(/^\uFEFF/,'');
-if(s.trim().charAt(0)==='['){try{const j=JSON.parse(s);if(!Array.isArray(j)||!j[0].q)throw 0;if(!confirm(i18("用檔案嘅 ","Replace the current ")+BANK.length+i18(" 題取代現有 "," questions with the ")+j.length+i18(" 題？"," questions in this file?")))return;BANK=j;save();reset();alert(i18("已載入 ","Loaded ")+BANK.length+i18(" 題"," questions"));}catch(e){alert(i18("JSON 格式唔啱","This JSON is not a question list"));}return;}
+if(s.trim().charAt(0)==='['){try{const j=JSON.parse(s);if(!Array.isArray(j)||!j[0].q)throw 0;if(!confirm(i18("用檔案嘅 "+j.length+" 題取代現有 "+BANK.length+" 題？","Replace the current "+BANK.length+" question"+_pl(BANK.length)+" with the "+j.length+" question"+_pl(j.length)+" in this file?")))return;BANK=j;save();reset();alert(i18("已載入 "+BANK.length+" 題","Loaded "+BANK.length+" question"+_pl(BANK.length)));}catch(e){alert(i18("JSON 格式唔啱","This JSON is not a question list"));}return;}
 const p=parseRows(s,'4N1');if(!p.out.length){alert(i18("表格格式唔啱：每行要有 課題,題目,答案,錯1,錯2,錯3","Wrong table format — each row needs at least: question, answer, wrong 1, wrong 2"));return;}
-if(!confirm(i18("用檔案嘅 ","Replace the current ")+BANK.length+i18(" 題取代現有 "," questions with the ")+p.out.length+i18(" 題？"," questions in this file?")))return;
-BANK=p.out;save();reset();alert(i18("已載入 ","Loaded ")+BANK.length+i18(" 題"," questions")+(p.bad.length?i18("；略過第 ","; skipped row ")+p.bad.join(","):""));};r.readAsArrayBuffer(f);}
-function listQ(){document.getElementById('count').textContent=i18("現有","Bank: ")+BANK.length+i18("題（存喺呢部機localStorage）"," questions (saved on this device)");document.getElementById('qlist').innerHTML=BANK.map((x,i)=>`<div>[${i+1}] ${x.t?'['+x.t+'] ':''}${x.q} → ${x.a} <button onclick="delQ(${i})">${i18('刪','Del')}</button></div>`).join("");}
+if(!confirm(i18("用檔案嘅 "+p.out.length+" 題取代現有 "+BANK.length+" 題？","Replace the current "+BANK.length+" question"+_pl(BANK.length)+" with the "+p.out.length+" question"+_pl(p.out.length)+" in this file?")))return;
+BANK=p.out;save();reset();alert(i18("已載入 "+BANK.length+" 題","Loaded "+BANK.length+" question"+_pl(BANK.length))+(p.bad.length?i18("；略過第 "+p.bad.join(", ")+" 行","; row "+p.bad.join(", ")+" skipped"):""));};r.readAsArrayBuffer(f);}
+function listQ(){document.getElementById('count').textContent=i18("現有 "+BANK.length+" 題（存喺呢部機）","Bank: "+BANK.length+" question"+_pl(BANK.length)+" (saved on this device)");document.getElementById('qlist').innerHTML=BANK.map((x,i)=>`<div>[${i+1}] ${x.t?'['+x.t+'] ':''}${x.q} → ${x.a} <button onclick="delQ(${i})">${i18('刪','Delete')}</button></div>`).join("");}
 let sL=0,sR=0,pool=[],deck=[],deadL=false,deadR=false;
 let marks={L:[],R:[]};
 let NQ=+(localStorage.getItem('heroTarget')||10);
@@ -915,7 +989,7 @@ const m0=document.getElementById('msg');m0.classList.remove('win');m0.textConten
 function endGame(){const m=document.getElementById('msg');stopTimer('L');stopTimer('R');
 const tname=s=>s==="L"?"Team A":"Team B";
 if(sL===sR){m.textContent=i18("打和 ","Draw ")+sL+" : "+sR+i18(" — 再嚟一局！"," — play again!");boom();showWin(null,sL,sR);}
-else{const w=sL>sR?"L":"R";m.textContent=tname(w)+" 勝！🎉";m.classList.add("win");winSide=w;boom();showWin(w,sL,sR);}
+else{const w=sL>sR?"L":"R";m.textContent=i18(tname(w)+" 勝！🎉",tname(w)+" wins! 🎉");m.classList.add("win");winSide=w;boom();showWin(w,sL,sR);}
 document.querySelectorAll('.opt').forEach(b=>b.disabled=true);}
 
 /* ===== 勝利畫面 + 慶祝號角 ===== */
@@ -953,7 +1027,7 @@ function showWin(side,aL,bR){
   document.getElementById('wbteam').textContent=side==='L'?i18('Team A 勝出','Team A wins'):side==='R'?i18('Team B 勝出','Team B wins'):i18('打和','Draw');
   const info=side&&window.pickInfo?window.pickInfo(side):null;
   document.getElementById('wbhero').textContent=info?info.emoji:'🤝';
-  document.getElementById('wbname').textContent=info?info.name:i18('分數相同','Same score');
+  document.getElementById('wbname').textContent=info?((typeof _hn==='function')?_hn(info):info.name):i18('分數相同','Same score');
   document.getElementById('wbscore').textContent=aL+' : '+bR;
   document.getElementById('wbAgain').textContent='🔄 '+i18('再嚟一局','Play again');
   document.getElementById('wbPick').textContent='↩ '+i18('換英雄','Change heroes');
@@ -5554,7 +5628,26 @@ vsPillar.position.set(0,3.6,-3.2);scene.add(vsPillar);
 
 // ----
 // 10 個角色＝9 個 CC0 獨立模型 + 1 個黑騎士造型；全部赤手抓繩，冇武器矛盾
-const _ENN={valkyrie:['Valkyrie','Golden mane, one mighty heave'],sorceress:['Frost Sorceress','One flick of the robe and you freeze'],huntress:['Twin-Tail Huntress','Two tails, one aim'],priestess:['Light Priestess','Blesses the rope before she pulls'],dancer:['Blade Dancer','Light on her feet, never lets go'],knight:['Holy Knight','Silver armour, steady as a rock'],dark:['Black Knight','Quiet \u2014 and one of the meanest'],guard:['Shield Guardian','His shield is bigger than he is \u2014 nobody can push him'],giant:['Great Axe Warrior','One man, the strength of three'],berserk:['Berserker','Drinks and chops at the same time'],wizard:['Wizard','Robe flowing, aura strong'],arcane:['Arcane Mage','One book, and he could take on the world'],rogue:['Rogue','Faster than the blink of an eye'],archer:['Marksman','Hood up, one shot, one kill'],sk_warr:['Undead Warrior','Even his bones give it all']};
+const _ENN = {
+  valkyrie: ['Valkyrie', 'Her golden mane flies as she hauls the rope.'],
+  sorceress: ['Frost Sorceress', 'One flick of her wand freezes you solid.'],
+  huntress: ['Twin-Tail Huntress', 'She has twin tails and only one aim.'],
+  priestess: ['Light Priestess', 'She blesses the rope before every pull.'],
+  dancer: ['Blade Dancer', 'She is light on her feet and never lets go.'],
+  knight: ['Holy Knight', 'He stands steady as a rock in silver armour.'],
+  dark: ['Black Knight', 'He says nothing, and he hits hard.'],
+  guard: ['Shield Guardian', 'His shield is almost as big as he is, so nobody can push him back.'],
+  giant: ['Great Axe Warrior', 'He has the strength of three men.'],
+  berserk: ['Berserker', 'He drinks and chops at the same time.'],
+  wizard: ['Wizard', 'His robe flows and his aura is strong.'],
+  arcane: ['Arcane Mage', 'Give him one book and he can take on the world.'],
+  rogue: ['Rogue', 'He is faster than the blink of an eye.'],
+  archer: ['Marksman', 'With his hood up, he never misses.'],
+  sk_warr: ['Undead Warrior', 'Even his bones give everything they have.'],
+  orc: ['Half-Orc', 'He is green, grinning and impossible to shift.'],
+  ghost: ['Ghost', 'You cannot touch him, yet he still pulls the rope.'],
+  sk_mage: ['Bone Mage', 'Even his bones know magic.'],
+};
 const _en=()=>{try{return LANG==='en'}catch(e){return false}};
 const _hn=h=>(_en()&&_ENN[h.id])?_ENN[h.id][0]:h.name;
 const _hb=h=>(_en()&&_ENN[h.id])?_ENN[h.id][1]:h.blurb;
@@ -5822,13 +5915,17 @@ function makeHero(cls,side,i){
   holder.rotation.y=(side==='L'?Math.PI/2:-Math.PI/2)+(cls.rot||0);
   return c;
 }
+function updateTags(){
+  const hl=getHero(picks.L||'knight'),hr=getHero(picks.R||'sk_warr');
+  const tL=document.querySelector('.left .tag'),tR=document.querySelector('.right .tag');
+  if(tL&&tL.firstChild&&tL.firstChild.nodeType===3)tL.firstChild.nodeValue='Team A \u00B7 '+hl.emoji+' '+_hn(hl)+' ';
+  if(tR&&tR.firstChild&&tR.firstChild.nodeType===3)tR.firstChild.nodeValue='Team B \u00B7 '+hr.emoji+' '+_hn(hr)+' ';
+}
 function buildTeams(chosenId,enemyId){
   teams.L.forEach(c=>scene.remove(c.root));teams.R.forEach(c=>scene.remove(c.root));
   teams.L=[];teams.R=[];
   const hl=getHero(chosenId),hr=getHero(enemyId);
-  const tL=document.querySelector('.left .tag'),tR=document.querySelector('.right .tag');
-  if(tL&&tL.firstChild&&tL.firstChild.nodeType===3)tL.firstChild.nodeValue='Team A \u00B7 '+hl.emoji+' '+_hn(hl)+' ';
-  if(tR&&tR.firstChild&&tR.firstChild.nodeType===3)tR.firstChild.nodeValue='Team B \u00B7 '+hr.emoji+' '+_hn(hr)+' ';
+  updateTags();
   for(let i=0;i<XS.length;i++){
     teams.L.push(makeHero(hl,'L',i));
     teams.R.push(makeHero(hr,'R',i));
@@ -6186,6 +6283,23 @@ function updateBar(){
   const tip=document.getElementById('pbarTip');if(!tip)return;
   const nm=id=>{const h=getHero(id);return id&&h?h.emoji+' '+_hn(h):'\u2014\u2014';};
   tip.innerHTML=i18('A：','A: ')+'<b>'+nm(picks.L)+'</b>'+i18('　B：','  B: ')+'<b>'+nm(picks.R)+'</b>';
+  updateStandoff();
+}
+function updateStandoff(){
+  const fill=(el,id,side)=>{
+    if(!el)return;
+    const h=id?getHero(id):null;
+    el.classList.toggle('got',!!h);
+    el.classList.toggle('act',step===side);
+    const f=el.querySelector('.sdface'),n=el.querySelector('.sdname'),bl=el.querySelector('.sdblurb');
+    if(f){f.textContent=h?h.emoji:'?';if(h&&f.dataset.last!==id){f.dataset.last=id||'';f.classList.remove('pop');void f.offsetWidth;f.classList.add('pop');}}
+    if(n)n.textContent=h?_hn(h):(step===side?i18('等你揀！','Your pick!'):i18('未揀','Not picked'));
+    if(bl)bl.textContent=h?_hb(h):'';
+  };
+  fill(document.getElementById('sdA'),picks.L,'L');
+  fill(document.getElementById('sdB'),picks.R,'R');
+  const r=document.getElementById('sdRound');
+  if(r)r.textContent=(picks.L&&picks.R)?i18('兩隊就緒！','Both ready!'):i18('第 ','Team ')+(step==='L'?'1':'2')+i18(' / 2 隊',' of 2');
 }
 function selectHero(id){
   if(!getHero(id))return;
@@ -6305,7 +6419,7 @@ function buildCards(){
   });
 }
 buildCards();
-window.rebuildPickCards=function(){buildCards();updateBar();setStep(step);};
+window.rebuildPickCards=function(){buildCards();updateBar();updateTags();setStep(step);};
 document.getElementById('gobtn').onclick=()=>{ if(step==='L')setStep('R'); else startNow(); };
 document.getElementById('backbtn').onclick=()=>setStep('L');
 // ----
