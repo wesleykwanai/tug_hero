@@ -433,9 +433,7 @@ background:radial-gradient(circle at 50% 0%,#2a1b52,#0b0718 70%)}
 #standoff .sdblurb{font-size:clamp(11px,1.7vh,20px);font-weight:800;color:#ffffffb8;text-align:center;line-height:1.45;max-width:min(100%,360px)}
 #standoff .sdvs{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-width:clamp(64px,9vw,120px)}
 #standoff .sdvs b{font-size:clamp(22px,5vh,60px);font-weight:900;color:#fff;letter-spacing:1px;text-shadow:0 0 24px #ffd16699}
-#standoff .sdvs small{font-size:clamp(10px,1.5vh,14px);font-weight:900;color:#ffe9a8;opacity:.9;white-space:nowrap}
-#standoff .sdvs .ropebar{width:134%;margin-left:-17%;height:5px;border-radius:4px;background:repeating-linear-gradient(90deg,#e8d9b0 0 8px,#c9b48a 8px 16px);opacity:.8;animation:sdRope 2.6s ease-in-out infinite}
-@keyframes sdRope{0%,100%{transform:translateX(-4px) skewX(-3deg)}50%{transform:translateX(4px) skewX(3deg)}}
+#standoff .sdvs small{font-size:clamp(10px,1.5vh,14px);font-weight:900;color:#ffe9a8;opacity:.9;white-space:nowrap}50%{transform:translateX(4px) skewX(3deg)}}
 @media(prefers-reduced-motion:reduce){#standoff *{animation:none!important}}
 #standoff .sdvs b{animation:sdVs 2.6s ease-in-out infinite}
 @keyframes sdVs{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
@@ -512,7 +510,7 @@ body.game{padding-bottom:104px}
 <div class="pcol">
 <div id="standoff">
 <div class="sd sdA" id="sdA"><div class="sdtag">🛡️ Team A</div><div class="sdface" id="sdFaceA">?</div><div class="sdname" id="sdNameA">——</div><div class="sdblurb" id="sdBlurbA"></div></div>
-<div class="sdvs"><div class="ropebar"></div><b>VS</b><small id="sdRound">——</small></div>
+<div class="sdvs"><b>VS</b><small id="sdRound">——</small></div>
 <div class="sd sdB" id="sdB"><div class="sdtag">⚔️ Team B</div><div class="sdface" id="sdFaceB">?</div><div class="sdname" id="sdNameB">——</div><div class="sdblurb" id="sdBlurbB"></div></div>
 </div>
 <div id="pickgrid"></div>
@@ -6062,7 +6060,8 @@ ropeMesh.castShadow=true;scene.add(ropeMesh);
 const knots=[];for(let i=0;i<2;i++){const k=new THREE.Mesh(new THREE.SphereGeometry(.15,10,8),ropeMat);scene.add(k);knots.push(k);}
 const _knotV=new THREE.Vector3();
 // 中場「戰況旗」：高桿 + 大三角旗（自動指住領先一方）+ 地面光環 + 光柱
-const flag=new THREE.Group();scene.add(flag);
+const FS=.72;                                   // 戰況旗縮小
+const flag=new THREE.Group();flag.scale.set(FS,FS,FS);scene.add(flag);
 const pole=new THREE.Mesh(new THREE.CylinderGeometry(.07,.07,3.1,10),M(0xffd166,.32));pole.position.y=1.55;pole.castShadow=true;flag.add(pole);
 const cap=new THREE.Mesh(new THREE.SphereGeometry(.17,12,10),new THREE.MeshStandardMaterial({color:0xfff3b8,emissive:0xffb020,emissiveIntensity:1.5,roughness:.3}));
 cap.position.y=3.16;flag.add(cap);
@@ -6129,7 +6128,7 @@ function loop(now){
   flag.position.copy(mid).setY(mid.y-.55);
   const lead=sL>sR?1:sR>sL?-1:0;                 // 邊隊領先
   const leadCol=lead===0?0xc9a227:(lead>0?0xe23b32:0x2f7de0);
-  flag.scale.x=lead>0?-1:1;                       // A 在左：領先 A 就指向左
+  flag.scale.x=(lead>0?-1:1)*FS;                  // A 在左：領先 A 就指向左
   flag.rotation.z=Math.sin(t*4)*.06+vel*.30;
   const heat=lead===0?.30:.55+.40*Math.min(1,Math.abs(sR-sL)/3);
   cloth.material.color.setHex(leadCol);
